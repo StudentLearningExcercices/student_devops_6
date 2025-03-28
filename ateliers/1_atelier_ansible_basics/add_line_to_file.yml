@@ -1,0 +1,10 @@
+---
+
+- name: "Add line to file"
+  hosts: localhost
+
+  tasks:
+    - include_role:
+        name: "add_text_to_file"
+      vars:
+        text_to_copy : "{{ text_to_copy }}"
