@@ -1,0 +1,9 @@
+#TODO : Créer un fichier test avec la commande touch
+- name: Créer un fichier test avec la commande touch.
+  # ...
+
+
+
+#TODO : Ajouter une ligne dans le fichier `test` (utiliser la variable text_to_copy )
+- name: Inserer une ligne à la fin du fichier.
+  # ...
