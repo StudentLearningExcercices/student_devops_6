@@ -19,13 +19,15 @@ jobs:
 
       #TODO : Installation des dépendances.
       - name: Install Python dependencies
-        working-directory: ...
-        # ...
+        working-directory: project/code
+        run: |
+          pip install -r requirements.txt
 
       #TODO : Exécution des tests.
       - name: Run Python tests
-        working-directory: ...
-        #...
+        working-directory: project/code/test
+        run: |
+          pytest .
 
       - name: Set version variable
         id: version
@@ -42,15 +44,23 @@ jobs:
 
       #TODO : Ajouter la commande pour générer les archives.
       - name: Run Ansible playbook to generate ZIPs
-        # ...
+        run: |
+          ansible-playbook project/infrastructure/ansible/create_front_and_backend_archives.yml -e version=${{ env.VERSION }}
+
 
       #TODO : Charger le zip du backend dans les artifacts.
       - name: Upload backend ZIP artifact
-        # ...
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-zip-${{ env.VERSION }}
+          path: project/build/backend-${{ env.VERSION }}.zip
 
       #TODO : Charger le zip du front dans les artifacts.
       - name: Upload front ZIP artifact
-        # ...
+        uses: actions/upload-artifact@v4
+        with:
+          name: front-zip-${{ env.VERSION }}
+          path: project/build/front-${{ env.VERSION }}.zip
 
 
   cd:
@@ -70,7 +80,10 @@ jobs:
 
       #TODO : Récupérer le zip du backend.
       - name: Download backend ZIP artifact
-        # ...
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-zip-${{ env.VERSION }}
+          path: project/build
 
       #TODO : Récupérer le zip du front.
       - name: Download front ZIP artifact
@@ -85,8 +98,10 @@ jobs:
           sudo apt-get install -y ansible unzip
 
       #TODO : Exécuter la commande Ansible pour décompresser l'archive du front.
+      #TODO : Exécuter la commande Ansible pour décompresser l'archive du front.
       - name: Run Ansible playbook to generate ZIPs
-        # ...
+        run: |
+          ansible-playbook project/infrastructure/ansible/unzip_archive.yml -e version=${VERSION}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -100,6 +115,8 @@ jobs:
       #TODO : Executer la commande terraform pour simuler la creation de l'infrastructure
       - name: Terraform Plan
         env:
-          # ...
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         working-directory: project/infrastructure/terraform
-        # ...
+        run: terraform plan -var version_backend=${{ env.VERSION }}
